@@ -1,0 +1,221 @@
+<!DOCTYPE HTML >
+<HTML>
+<HEAD>
+<TITLE>tutorial</TITLE>
+<META charset="utf-8">
+<LINK href="css/tictactoe.css" rel="stylesheet" type="text/css">	
+</HEAD>
+
+<body>
+	<div id="container">
+	<input type="radio" name="start" value="human" checked="checked">Human first<br>
+	<input type="radio" name="start" value="computer">Computer First<br>
+	</hr>
+		<table id="board" class="normal">
+			<tr>
+				<td id='0'></td>
+				<td id='1'></td>
+				<td id='2'></td>
+			</tr>
+			<tr>
+				<td id='3'></td>
+				<td id='4'></td>
+				<td id='5'></td>
+			</tr>
+			<tr>
+				<td id='6'></td>
+				<td id='7'></td>
+				<td id='8'></td>
+			</tr>
+		</table>
+	</div>	
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script>
+$(document).ready(function() {
+var player='X';
+var board = [[0,0,0],[0,0,0],[0,0,0]];
+var moves=0; //counts how many moves have been made
+var flag=0; //Checks where the computer places its first move
+
+$('input[type=radio][name=start]').change(function() { //if there is a change in radio button input
+        resetGame();
+ });
+
+
+$("#board").on("click", "td", function() {
+     if(!$(this).text()) //only if the user clicks on an empty spot
+     {
+     	player='X';
+     	var id=$(this).attr('id'); 
+     	$(this).text(player);//set the text as 'X'
+     	if(player=='X'){
+     		board[Math.floor(id/3)][id%3] = 'X';
+     		moves++;
+     		if(!checkwin()){ //checks if player has won or draw
+				computerMove();
+	     	if(!checkwin()) //check if computer wins or draw
+	     		player='X';
+	     	else
+	     		resetGame(); // start over	     		     			
+     		}
+     		else
+     			resetGame(); //start over
+
+     	}		
+     }
+   
+   });
+
+
+
+function checkwin(){ //Checks if there is 3 in a row of 'X' or 'O'
+	//alert(board);
+	if(moves==9){
+		alert("Draw!");
+		return true;
+	}	
+	for (var i = 0; i < 3; i++) {
+		//alert(board);
+		if(board[i][0]==board[i][1] && board[i][1]==board[i][2] && board[i][0]){ //horizontal check
+			alert("Player " + player + " wins");
+			return true;
+		}
+		if(board[0][i]==board[1][i] && board[1][i]==board[2][i] && board[0][i]){ //vertical check
+			alert("Player " + player + " wins");
+			return true;
+		}	
+	}
+	if((board[0][0]==board[1][1] && board[1][1]==board[2][2] && board[0][0])|| //diagonal check
+		(board[0][2]==board[1][1] && board[1][1]==board[2][0]) && board[1][1]){
+			alert("Player " + player + " wins");
+			return true;
+	}
+	return false;
+
+}
+
+function resetGame(){ //start over
+	moves=0;
+	board = [[0,0,0],[0,0,0],[0,0,0]];
+	//player='X';
+	for(var i=0;i<9;i++)
+	{
+		$("#"+ i).text('');	
+	}
+	startNewGame();
+}
+
+function startNewGame(){
+		if ($('input[type=radio]:checked').val() == 'computer') { //if the computer has to start first
+            computerMove();
+        }
+}
+
+function computerMove()
+{
+	player='O'; //change player
+	if(moves<2){ //the first computer move should be in centre or corner
+		computerFirstMoves();
+		player='X';
+	}
+	else{
+			if(!computerTryWin('O')){ //try and make 3 in a row if possible
+				if(!computerTryWin('X')){ //try and block 3 in a row if possible
+					computerBestOption(); //choose the best other option from the options
+				}
+			}
+	}	
+	moves++; //increase moves
+}
+
+function computerFirstMoves(){ //Place either at the center of the board or top right corner
+			if(!board[1][1]){
+			flag=0;
+			makemove(1,1);
+		}	
+		else{
+			flag=1;
+			makemove(0,0);
+		}
+}
+
+function computerTryWin(c){//tries to see if 'O' can be placed so that the computer wins or blocks human from winning
+		var a;
+		var b;
+		var d;
+		for (var i = 0; i < 3; i++) {
+			for(var j=0; j<3;j++){
+				if(!board[i][j]){
+					a=[0,1,2];
+					b=[0,1,2];
+					a.splice(i,1);
+					b.splice(j,1);
+					if((board[a[0]][j]== c && board[a[1]][j]== c)|| (board[i][b[0]]==c && board[i][b[1]]==c))
+					{
+						makemove(i,j);
+						return true;
+					}
+					if(i==j)
+					{
+						if(board[a[0]][a[0]]== c && board[a[1]][a[1]]== c){
+						makemove(i,j);
+						return true;
+						}							
+					}
+					if(i==2-j){
+						if(board[a[0]][2-a[0]]== c && board[a[1]][2-a[1]]== c){
+						makemove(i,j);
+						return true;
+						}
+
+					}	
+				}
+			}
+		}
+		return false;
+}
+
+function computerBestOption(){
+	
+	if(moves==3)//move 3 is vital in forcing a draw!
+	{
+		//alert(flag);
+		if(flag==0){//if computer has played in centre of board
+
+			for (var i = 0; i < 3; i++) {//try and play below the first X us see
+				for(var j=0; j<3;j++){
+				if(board[i][j]=='X' && i+1 < 3 && board[i+1][j]==0 ){
+						makemove(i+1,j);
+						return;
+					}	
+				}
+			}		
+		}
+		else{//if computer has played at the top left corner
+			makemove(0,2);
+			return;
+		}	
+	}
+	//choose at random first one which is empty
+	for (var i = 0; i < 3; i++) {
+		for(var j=0; j<3;j++){
+			if(board[i][j]==0){
+				makemove(i,j);
+				return;
+			}	
+		}
+	}
+}
+
+function makemove(a, b){//move O to a particular place on the board and set it on the table
+	board[a][b]='O';
+	$("#"+ (a*3+b)).text(player);
+}
+
+});	
+
+
+</script>
+</body>
+</HTML>	
