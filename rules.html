@@ -10,7 +10,7 @@
 	<div id="container">
 	<input type="radio" name="start" value="human" checked="checked">Human first<br>
 	<input type="radio" name="start" value="computer">Computer First<br>
-	</hr>
+	<br>
 		<table id="board" class="normal">
 			<tr>
 				<td id='0'></td>
@@ -135,7 +135,7 @@ function computerFirstMoves(){ //Place either at the center of the board or top 
 			makemove(1,1);
 		}	
 		else{
-			flag=1;
+			flag=1; //human has played in the centre of board so set flag
 			makemove(0,0);
 		}
 }
