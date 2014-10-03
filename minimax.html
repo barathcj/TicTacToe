@@ -34,8 +34,8 @@
 <script>
 $(document).ready(function() {
 
-var gameBoard = [[0,0,0],[0,0,0],[0,0,0]];
-var choice = [];
+var gameBoard = [[0,0,0],[0,0,0],[0,0,0]]; //stores the current state of the board
+var choice = []; //stores what the best choice is for the computer
 
 $('input[type=radio][name=start]').change(function() { //whenever there is a change in the radio buttons, reset and start new game
         resetGame();
@@ -65,8 +65,6 @@ $("#board").on("click", "td", function() {
             }
         }
      }
-   
-
 });
 
 function displayResults(result) //Displays the 3 different possible scenarios
